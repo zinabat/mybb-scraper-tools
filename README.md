@@ -4,9 +4,10 @@
 
 These tools require [Python 3](https://www.python.org/downloads/) to run.
 
-1. Download the latest release
-2. Ensure the tool script is executable with `chmod +x generate_random_char.sh`
-3. Run the script
+1. Run `git clone https://github.com/zinabat/mybb-scraper-tools.git`
+1. `cd mybb-scraper-tool`
+1. Ensure the tool script is executable with `chmod +x generate_random_char.sh`
+1. Run the script
 
 ## Random Active Character Selector
 
