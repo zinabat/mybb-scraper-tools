@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wolf RPG - Random character picker by Zina</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #e9e9e9;
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6rem;
+      font-size: 16px;
+    }
+    #result[hidden] {
+      display: none;
+    }
+    #result-header {
+      text-align: center;
+    }
+    .wrapper {
+      width: 700px;
+      margin: 0 auto;
+      padding: 50px 0;
+    }
+    code {
+      border: 1px solid #5e96db;
+      display: block;
+      padding: 5px;
+      background: #0b1520;
+      color: #ffdca5;
+      white-space: pre-wrap;
+    }
+    .button-wrapper {
+      margin-top: 10px;
+    }
+    button {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      background: #0b803f;
+      color: #fff;
+      outline: 0;
+      border: 1px solid #0e9e4f;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 3px;
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+    }
+    button[disabled] .lds-hourglass {
+      display: inline-block;
+    }
+    button[disabled],
+    button[disabled]:hover, button[disabled]:active, button[disabled]:focus {
+      background-color: #616e67;
+      border-color: #818884;
+      cursor: default;
+    }
+    button:hover, button:active, button:focus {
+      background-color: #13aa57;
+      border-color: #2bd376;
+    }
+    .lds-hourglass {
+      display: none;
+      position: relative;
+      width: 35px;
+      height: 35px;
+      margin-left: 0.4rem;
+    }
+    .lds-hourglass:after {
+      content: " ";
+      display: block;
+      border-radius: 50%;
+      width: 0;
+      height: 0;
+      box-sizing: border-box;
+      border: 16px solid #fff;
+      border-color: #fff transparent #fff transparent;
+      animation: lds-hourglass 1.2s infinite;
+    }
+    @keyframes lds-hourglass {
+      0% {
+        transform: rotate(0);
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      }
+      50% {
+        transform: rotate(900deg);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      100% {
+        transform: rotate(1800deg);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <h2>Random Active Character</h2>
+  <div class="button-wrapper">
+    <button id="pickBtn" disabled><span>loading</span><div class="lds-hourglass"></div></button>
+  </div>
+  <div id="result" hidden>
+    <p>This character was randomly picked from non PPC characters with >= 50 posts.</p>
+    <div id="result-header">
+      <img src="https://wolf-rpg.com/uploads/avatars/avatar_5337.png?dateline=1575057782" alt="">
+      <h3><a href="https://wolf-rpg.com/member.php?action=profile&uid=5337" target="_blank">Penn</a></h3>
+    </div>
+    <h2>Character of the Month Code</h2>
+    <code id="cotm-code"></code>
+  </div>
+</div>
+<script type="text/javascript">
+let timeoutId = null;
+let timeLimit = 0;
+// on document load
+document.addEventListener("DOMContentLoaded", () => {
+  fetchRandomCharacter();
+});
+
+document.querySelector('#pickBtn').addEventListener('click', () => {
+  fetchRandomCharacter();
+});
+
+async function fetchRandomCharacter() {
+  if (timeLimit > 0) return;
+  timeLimit = 1000;
+  timeoutId = setTimeout(() => {
+    timeLimit = 0; // 1 second
+  }, timeLimit);
+  const btn = document.querySelector('#pickBtn');
+  btn.setAttribute('disabled', '');
+  document.querySelector('#result').setAttribute('hidden', '');
+  // hit api
+  const user = await fetch('https://14qp928yo9.execute-api.us-east-1.amazonaws.com/Prod/random-char/api')
+    .then((res) => {
+      if (!res.ok) console.error(res);
+      return res.json();
+    });
+  // img, if available
+  const img = user['img'] !== undefined ? `<img src="${user['img']}" alt="">` : '';
+  // link and name
+  const heading = `<h3><a href="${user['href']}" target="_blank">${user['name']}</a></h3>`;
+  // character of month code
+  const code = `[narrow][border][align=center][h1]Character of the Month[/h1]${user['img'] ? '\
+[img]'+user['img']+'[/img]\
+': ''}
+[h2][url=${user['href']}]${user['name']}[/url][/h2]
+[hr]
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+[small]This character was pulled from a virtual hat![/small]
+[/align][/border][/narrow]`;
+  // fill the dom
+  document.querySelector('#result-header').innerHTML = `${img}${heading}`;
+  document.querySelector('#cotm-code').innerText = code;
+  // show result
+  document.querySelector('#result').removeAttribute('hidden');
+  // set button to loaded state
+  btn.removeAttribute('disabled');
+  btn.querySelector('span').innerText = 'pick again';
+}
+</script>
+</body>
+</html>
